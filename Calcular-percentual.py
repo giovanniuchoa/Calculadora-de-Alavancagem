@@ -1,33 +1,70 @@
-perdaMax = int(input("\nQuantos dólares poderá perder na operação? ")) # Perda Máxima em $
-margem = int(input("\nQuantos dólares serão aplicados? ")) # Dinheiro aplicado na operação
+import tkinter as tk
 
-percMax = (perdaMax*100)/margem # Percentual de perda máxima
+def calcular_alavancagem():
+    perdaMax = float(perdaMax_entry.get())
+    margem = float(margem_entry.get())
+    entrada = float(entrada_entry.get())
+    take = float(take_entry.get())
+    stop = float(stop_entry.get())
 
-entrada = float(input("\nValor de entrada: "))
-take = float(input("\nValor do alvo: "))
-stop = float(input("\nValor do stop: "))
+    percMax = (perdaMax * 100) / margem
+    difStop = stop - entrada
+    percStop = (difStop * 100) / entrada
 
-difStop = stop-entrada # Diferença do stop para a entrada
+    if percStop < 0:
+        percStop = percStop * -1
 
-percStop = (difStop*100)/entrada # Percentual na diferença do stop para a entrada
+    if percStop > percMax:
+        result_label.configure(text="Escolha um ponto de stop mais próximo, senão sua perda poderá ser maior que o máximo!")
+        return
 
-if (percStop < 0):
-    percStop = percStop*-1
+    alMax = 0
+    temp = percStop
+    while temp < percMax:
+        if temp + percStop < percMax:
+            alMax += 1
+            temp = percStop * alMax
+        else:
+            break
 
-if (percStop > percMax):
-    print("\nEscolha um ponto de stop mais próximo, senão sua perda poderá ser maior que o máximo!\n")
-    exit()
-
-alMax = int(0)
-temp = percStop
-while (temp < percMax):
-    if (temp+percStop < percMax):
-        alMax += 1
-        temp = percStop*alMax
+    if alMax == 0:
+        result_label.configure(text="O melhor a se fazer é não alavancar!")
     else:
-        break
+        result_label.configure(text="Sua alavancagem máxima pode ser de {} vezes".format(alMax))
 
-if (alMax==0):
-    print("O melhor a se fazer é não alavancar!")
-else:
-    print("\nSua alavancagem máxima pode ser de ",alMax," vezes\n")
+root = tk.Tk()
+root.title("Calculadora de Alavancagem")
+root.geometry("400x300")
+
+perdaMax_label = tk.Label(root, text="Quantos dólares poderá perder na operação?")
+perdaMax_label.pack()
+perdaMax_entry = tk.Entry(root)
+perdaMax_entry.pack()
+
+margem_label = tk.Label(root, text="Quantos dólares serão aplicados?")
+margem_label.pack()
+margem_entry = tk.Entry(root)
+margem_entry.pack()
+
+entrada_label = tk.Label(root, text="Valor de entrada:")
+entrada_label.pack()
+entrada_entry = tk.Entry(root)
+entrada_entry.pack()
+
+take_label = tk.Label(root, text="Valor do alvo:")
+take_label.pack()
+take_entry = tk.Entry(root)
+take_entry.pack()
+
+stop_label = tk.Label(root, text="Valor do stop:")
+stop_label.pack()
+stop_entry = tk.Entry(root)
+stop_entry.pack()
+
+calcular_button = tk.Button(root, text="Calcular", command=calcular_alavancagem)
+calcular_button.pack()
+
+result_label = tk.Label(root, text="")
+result_label.pack()
+
+root.mainloop()
